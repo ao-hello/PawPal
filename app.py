@@ -11,7 +11,7 @@ def _priority_label(p: str) -> str:
     return f"{PRIORITY_ICON.get(p, '')} {p}"
 
 
-# ── Owner & Pet setup ────────────────────────────────────────────────────────
+#Owner & Pet setup ────────────────────────────────────────────────────────
 
 with st.expander("Owner & Pet Setup", expanded=True):
     col1, col2 = st.columns(2)
@@ -38,7 +38,7 @@ with st.expander("Owner & Pet Setup", expanded=True):
             name=owner_name, pets=[pet], available_minutes=int(available_minutes)
         )
 
-# ── Add tasks ────────────────────────────────────────────────────────────────
+#Add tasks ────────────────────────────────────────────────────────────────
 
 st.divider()
 st.subheader("Add a Task")
@@ -56,7 +56,7 @@ with col5:
     scheduled_time = st.text_input("Preferred time (HH:MM)", value="", placeholder="e.g. 08:00")
 
 if st.button("Add task"):
-    # Validate optional scheduled_time
+    #Validate optional scheduled_time
     import datetime as _dt
     parsed_time = ""
     if scheduled_time.strip():
@@ -77,14 +77,14 @@ if st.button("Add task"):
     st.session_state.owner.pets[0].add_task(new_task)
     st.success(f"Added '{task_title}'")
 
-# ── Recurring task reset ──────────────────────────────────────────────────────
+#Recurring task reset ──────────────────────────────────────────────────────
 
 if st.button("Reset daily recurring tasks (new day)"):
     for pet in st.session_state.owner.pets:
         pet.reset_recurring_tasks()
     st.success("All completed daily tasks have been reset.")
 
-# ── Filter tasks ──────────────────────────────────────────────────────────────
+#Filter tasks ──────────────────────────────────────────────────────────────
 
 st.divider()
 st.subheader("Filter Tasks")
@@ -118,7 +118,7 @@ with st.expander("Filter options"):
     )
 
     if filtered:
-        # Sort filtered results: tasks with a preferred time by time, rest by priority
+        #Sort filtered results: tasks with a preferred time by time, rest by priority
         timed = scheduler.sort_by_time([t for t in filtered if t.scheduled_time])
         untimed = scheduler._sort_tasks([t for t in filtered if not t.scheduled_time])
         display_order = timed + untimed
@@ -144,13 +144,13 @@ with st.expander("Filter options"):
         else:
             st.info("No tasks yet — add one above.")
 
-# ── Pending task table ────────────────────────────────────────────────────────
+#Pending task table ────────────────────────────────────────────────────────
 
 st.divider()
 st.subheader("All Pending Tasks")
 st.caption("Sorted by priority (high → medium → low), then by duration within each priority.")
 
-# Use Scheduler's sort so the display matches the scheduling logic
+#Use Scheduler's sort so the display matches the scheduling logic
 pending = scheduler._sort_tasks(st.session_state.owner.pets[0].get_pending_tasks())
 if pending:
     total_pending_min = sum(t.duration_minutes for t in pending)
@@ -178,7 +178,7 @@ if pending:
 else:
     st.info("No pending tasks.")
 
-# ── Build schedule ────────────────────────────────────────────────────────────
+#Build schedule ────────────────────────────────────────────────────────────
 
 st.divider()
 st.subheader("Build Schedule")
@@ -195,39 +195,39 @@ if st.button("Generate schedule"):
 
     plan = scheduler.generate_plan(day_start=day_start)
 
-    # ── Conflict warnings ────────────────────────────────────────────────────
+    #Conflict warnings ────────────────────────────────────────────────────
     # Each conflict type gets its own styled callout with an actionable tip so
-    # a pet owner knows exactly what to do — not just that something is wrong.
+    # a pet owner knows exactly what to do — not just that something is wrong
     if plan.conflicts:
         st.subheader("⚠️ Conflicts Detected")
         for c in plan.conflicts:
             if "always be skipped" in c:
-                # A high-priority task that can never fit — most urgent problem
+                #urgent: A high-priority task that can never fit
                 st.error(
                     f"🚨 **Critical — task will always be skipped:** {c}\n\n"
                     "_What to do: Either shorten this task or increase your available minutes for today._"
                 )
             elif "Time-slot conflict" in c:
-                # Two tasks with overlapping preferred times
+                #Two tasks with overlapping preferred times
                 st.warning(
                     f"🕐 **Time-slot overlap:** {c}\n\n"
                     "_What to do: Edit the preferred time of one of these tasks so they don't overlap._"
                 )
             elif "Duplicate task" in c:
-                # Same task title added twice — likely a data-entry mistake
+                # Same task title added twice
                 st.warning(
                     f"📋 **Duplicate task:** {c}\n\n"
                     "_What to do: Check your task list and remove the extra copy._"
                 )
             else:
-                # Total time exceeds available minutes — some tasks will be skipped
+                #Total time exceeds available minutes, some tasks will be skipped
                 st.warning(
                     f"⏱️ **Over budget:** {c}\n\n"
                     "_What to do: Remove lower-priority tasks, shorten task durations, "
                     "or increase your available minutes. High-priority tasks are protected._"
                 )
 
-    # ── Timed schedule table ─────────────────────────────────────────────────
+    #Timed schedule table ─────────────────────────────────────────────────
     if plan.timed_schedule:
         st.success(f"✅ Scheduled {len(plan.timed_schedule)} task(s) for today:")
         st.table(
@@ -245,7 +245,7 @@ if st.button("Generate schedule"):
     else:
         st.info("No tasks could be scheduled.")
 
-    # ── Skipped tasks ────────────────────────────────────────────────────────
+    #skipped tasks ────────────────────────────────────────────────────────
     if plan.skipped_tasks:
         st.error(
             f"⏭️ {len(plan.skipped_tasks)} task(s) skipped — not enough time remaining:"
@@ -261,6 +261,6 @@ if st.button("Generate schedule"):
             ]
         )
 
-    # ── Full text reasoning ──────────────────────────────────────────────────
+    #Full text reasoning ──────────────────────────────────────────────────
     with st.expander("Full reasoning"):
         st.text(plan.summary())

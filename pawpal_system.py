@@ -47,7 +47,7 @@ class Task:
         elif self.frequency == "weekly":
             next_date = base + timedelta(weeks=1)
         else:
-            # Unknown frequency — default to +1 day so nothing breaks silently
+            # Unknown frequency —default to +1 day so nothing breaks silently
             next_date = base + timedelta(days=1)
 
         return Task(
@@ -172,9 +172,8 @@ class Scheduler:
     def __init__(self, owner: Owner):
         self.owner = owner
 
-    # ------------------------------------------------------------------
+
     # Recurring task automation
-    # ------------------------------------------------------------------
     def mark_task_complete(self, pet: Pet, task: Task) -> Task | None:
         """Mark a task complete and, if it recurs, add its next occurrence to the pet.
 
@@ -201,9 +200,8 @@ class Scheduler:
         pet.add_task(next_task)
         return next_task
 
-    # ------------------------------------------------------------------
+
     # Algorithm 1a: Sort tasks by scheduled_time (HH:MM string)
-    # ------------------------------------------------------------------
     def sort_by_time(self, tasks: list) -> list:
         """Return tasks sorted by their scheduled_time in ascending order.
 
@@ -225,9 +223,8 @@ class Scheduler:
 
         return sorted(tasks, key=time_key)
 
-    # ------------------------------------------------------------------
+
     # Algorithm 1b: Multi-key sort (priority + duration tie-break)
-    # ------------------------------------------------------------------
     def _sort_tasks(self, tasks: list) -> list:
         """Sort tasks by priority first, then by duration (shorter tasks first).
 
@@ -243,9 +240,8 @@ class Scheduler:
             key=lambda t: (PRIORITY_ORDER.get(t.priority, 99), t.duration_minutes),
         )
 
-    # ------------------------------------------------------------------
+
     # Algorithm 2: Filter tasks
-    # ------------------------------------------------------------------
     def filter_tasks(self, pet_name: str = None, priority: str = None,
                      frequency: str = None, completed: bool = None) -> list:
         """Return tasks matching all supplied filters (None = no filter on that field).
@@ -274,9 +270,8 @@ class Scheduler:
                 results.append(task)
         return results
 
-    # ------------------------------------------------------------------
+
     # Algorithm 3: Conflict detection
-    # ------------------------------------------------------------------
     def detect_conflicts(self, tasks: list) -> list:
         """Return a list of human-readable conflict warning strings.
 
@@ -340,9 +335,8 @@ class Scheduler:
 
         return warnings
 
-    # ------------------------------------------------------------------
+
     # Algorithm 4: Assign start times
-    # ------------------------------------------------------------------
     def _assign_start_times(self, scheduled: list, day_start: str = "08:00") -> list:
         """Return list of (Task, start_time_str) tuples with wall-clock start times.
 
@@ -362,9 +356,9 @@ class Scheduler:
             current += timedelta(minutes=task.duration_minutes)
         return result
 
-    # ------------------------------------------------------------------
+
+
     # Main entry point
-    # ------------------------------------------------------------------
     def generate_plan(self, day_start: str = "08:00") -> Plan:
         """Sort, conflict-check, and greedily schedule tasks within available time."""
         pending = self.owner.get_pending_tasks()

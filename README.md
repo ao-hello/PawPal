@@ -7,6 +7,10 @@
 ## 📸 Demo
 
 
+https://github.com/user-attachments/assets/42f73ca9-695c-423c-bb9a-78721b4dacfe
+
+
+
 ---
 
 ## ✨ Features
